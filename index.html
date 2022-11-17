@@ -132,7 +132,159 @@ Nuestro fin es poder informar acerca de esta famosa triatlon, la cual pasa muy p
 <B>Nosotros</B><p>
 Somos un grupo escolar que brindamos información sobre los deportes, en este caso el Ironman(Carrera). 
  <p>
- <center><B>Aca te dejamos un cronometro para ayudarte en tu rutina de ejercicios</B></center>
-<center><iframe src="https://editor.p5js.org/pierobonenzo46/full/wdWY1eloO" width="602" height="542"></iframe></center>
+ <B>Juego de carrera y obtaculos</B>
+<body translate="no">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/bmoren/p5.collide2D/p5.collide2d.min.js"></script> 
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8">
+    <script src="sketch.js"></script>
+    <script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-2c7831bb44f98c1391d6a4ffda0e1fd302503391ca806e7fcc7b9b87197aec26.js"></script>
+      <script id="rendered-js">
+//game variables
+let dino, myText, myOtherText, lostGame;
+let score = 0;
+let lastSpawn = 0;
+let spawnDelay = 2000;
+let obstacles = [];
+let screen = null;
+
+function setup() {
+  createCanvas(500, 400);
+  dinoo = loadImage ('https://i.ibb.co/CPrNF6P/58659923-ilustraci-n-simple-l-nea-de-negro-de-vectores-persona-corriendo.png')
+  pie = loadImage ('https://i.ibb.co/SccrX59/30bc99162bca69bdbd27451ceeef8848-ilustracion-de-piedra-de-la-tierra.png')
+  dino = new dinoSquare();
+
+ 
+}
+
+function draw() {
+  //display the game obstacles
+  if (millis() >= lastSpawn + spawnDelay) {
+    obstacles.push(new Obstacles());
+    spawnDelay = random([0.6, 0.7, 0.8, 0.9, 1]) * 1000;
+    lastSpawn = millis();
+    score++;
+  }
+  background(0);
+
+
+  for (let o of obstacles) {
+    o.show();
+    o.move();
+
+    //what happens when the dino collides with the obstacles
+    if (dino.collides(o)) {
+      noLoop();
+      lostGame = true;
+      screen = 2;
+    }
+  }
+  dino.show();
+  dino.move();
+
+  if (keyIsDown(UP_ARROW)) {
+    dino.jump();
+  }
+  countScore();
+}
+
+function keyPressed() {
+  if (key === " ") {
+    dino.jump();
+
+    //restart the game when space bar is clicked
+    if (lostGame === true) {
+      restartGame();
+    }
+  }
+}
+
+//restart the game when the canvas is clicked on
+function mousePressed() {
+  if (screen === 2) {
+    restartGame();
+  }
+}
+
+const countScore = () => {
+  fill(255);
+  noStroke();
+  textSize(20);
+  text("Score:" + score, 5, 20);
+};
+
+//function that restarts the game
+const restartGame = () => {
+  score = 0;
+  obstacles = [];
+  lostGame = false;
+  dino = new dinoSquare();
+  lastSpawn = 0;
+  spawnDelay = 500;
+  new Obstacles();
+  loop();
+};
+
+//class for creating the dino for the game
+class dinoSquare {
+  constructor() {
+    this.x = 20;
+    this.rectSize = 100;
+    this.y = height - this.rectSize;
+    this.velocityY = 0;
+    this.gravity = 0.65;
+    this.constrainY = 0;
+  }
+
+  jump() {
+    if (this.y === height - this.rectSize) {
+      this.velocityY = -12;
+    }
+  }
+
+  move() {
+    this.y += this.velocityY;
+    this.velocityY += this.gravity;
+    this.y = constrain(this.y, this.constrainY, height - this.rectSize);
+  }
+
+  show() {
+    image (dinoo,this.x, this.y, this.rectSize, this.rectSize);
+  }
+  //detect the collisions between the dino and the obstacles
+  collides(obstacle) {
+    let collide = collideRectRect(
+    this.x,
+    this.y,
+    this.rectSize,
+    this.rectSize,
+    obstacle.x,
+    obstacle.y,
+    obstacle.obstacleSize,
+    obstacle.obstacleSize);
+
+    return collide;
+  }}
+
+
+//class the creates the obstacles for the game
+class Obstacles {
+  constructor() {
+    this.obstacleSize = 40;
+    this.x = width;
+    this.obstaclePos = 40;
+    this.y = height - this.obstaclePos;
+  }
+  show() {
+    image(pie,this.x, this.y, this.obstacleSize, this.obstacleSize);
+  }
+  move() {
+    this.x -= 11;
+  }}
+//# sourceURL=pen.js
+    </script>
+</body>
 </body>
 </html>
